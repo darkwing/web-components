@@ -25,10 +25,10 @@ if (!(document.register || {}).__polyfill__){
               'prototype': _prototype,
               'fragment': options.fragment || doc.createDocumentFragment(),
               'lifecycle': {
-                created: lifecycle.created || function(){},
-                removed: lifecycle.removed || function(){},
-                inserted: lifecycle.inserted || function(){},
-                attributeChanged: lifecycle.attributeChanged || function(){}
+                created: lifecycle.created || noop,
+                removed: lifecycle.removed || noop,
+                inserted: lifecycle.inserted || noop,
+                attributeChanged: lifecycle.attributeChanged || noop
               }
             };
         tag.constructor.prototype = tag.prototype;
@@ -38,6 +38,8 @@ if (!(document.register || {}).__polyfill__){
         return tag.constructor;
       };
     
+    function noop(){}
+
     function unwrapPrototype(proto){
       var definition = {},
           names = Object.getOwnPropertyNames(proto),
@@ -48,7 +50,7 @@ if (!(document.register || {}).__polyfill__){
       return definition;
     }
     
-    function typeOf(obj) {
+    function typeOf(obj){
       return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
     }
     
@@ -156,9 +158,7 @@ if (!(document.register || {}).__polyfill__){
         if (element._suppressObservers) delete element._suppressObservers;
         else {
           getTag(element).lifecycle.removed.call(element);
-          if (element.childNodes.length) query(element, tokens).forEach(function(el){
-            removed(el);
-          });
+          if (element.childNodes.length) query(element, tokens).forEach(removed);
         }
       }
     }
